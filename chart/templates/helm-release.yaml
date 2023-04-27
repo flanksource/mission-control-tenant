@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ include "mission-control-tenant.fullname" . }}
+  labels:
+    {{- include "mission-control-tenant.labels" . | nindent 4 }}
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: mission-control
+      sourceRef:
+        kind: HelmRepository
+        name: {{ include "mission-control-tenant.fullname" . }}
+      interval: 1m
+  kubeConfig:
+    secretRef:
+      name: vc-{{ include "mission-control-tenant.fullname" . }}
+      key: config
+  {{- with .Values.missionControl }}
+  values:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

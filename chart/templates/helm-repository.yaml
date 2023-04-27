@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: {{ include "mission-control-tenant.fullname" . }}
+  labels:
+    {{- include "mission-control-tenant.labels" . | nindent 4 }}
+spec:
+  interval: 1m
+  url: http://flanksource.github.io/charts

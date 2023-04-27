@@ -1,0 +1,25 @@
+nameOverride: ""
+fullnameOverride: ""
+
+missionControl:
+  db:
+    storageClass: managed
+  flanksource-ui:
+    oryKratosURL: https://mission-control.local/kratos
+    ingress:
+      annotations:
+        kubernetes.io/tls-acme: "true"
+      host: mission-control.local
+      tls:
+        - hosts:
+            - mission-control.demo.local
+          secretName: mission-control-tls
+
+vcluster:
+  sync:
+   ingresses:
+       enabled: true
+   persistentvolumes:
+       enabled: true
+    persistentvolumeclaims:
+      enabled: true
