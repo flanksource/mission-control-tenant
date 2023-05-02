@@ -3,6 +3,7 @@ fullnameOverride: ""
 
 missionControl:
   db:
+    runMigrations: true
     storageClass: managed
   flanksource-ui:
     oryKratosURL: https://mission-control.local/kratos
