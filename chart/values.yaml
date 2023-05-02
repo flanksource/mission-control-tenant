@@ -18,8 +18,8 @@ missionControl:
 vcluster:
   sync:
    ingresses:
-       enabled: true
+     enabled: true
    persistentvolumes:
-       enabled: true
-    persistentvolumeclaims:
-      enabled: true
+     enabled: true
+   persistentvolumeclaims:
+     enabled: true
