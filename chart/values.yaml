@@ -24,3 +24,9 @@ vcluster:
       enabled: true
     persistentvolumeclaims:
       enabled: true
+  init:
+    manifests: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: production
