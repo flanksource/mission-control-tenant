@@ -15,7 +15,7 @@ spec:
       interval: 1m
   kubeConfig:
     secretRef:
-      name: vc-{{ include ".Release.Name" . }}
+      name: vc-{{ .Release.Name }}
       key: config
   {{- with .Values.missionControl }}
   values:
