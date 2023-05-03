@@ -22,8 +22,6 @@ vcluster:
       enabled: true
     persistentvolumes:
       enabled: true
-    persistentvolumeclaims:
-      enabled: true
   init:
     manifests: |-
       apiVersion: v1
