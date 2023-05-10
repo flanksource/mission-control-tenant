@@ -20,8 +20,8 @@ vcluster:
   sync:
     ingresses:
       enabled: true
-    persistentvolumes:
-      enabled: true
+  storage:
+    size: 15Gi
   init:
     manifests: |-
       apiVersion: v1
