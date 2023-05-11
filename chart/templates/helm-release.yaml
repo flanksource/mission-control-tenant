@@ -13,6 +13,7 @@ spec:
         kind: HelmRepository
         name: {{ include "mission-control-tenant.fullname" . }}
       interval: 1m
+  targetNamespace: default
   kubeConfig:
     secretRef:
       name: vc-{{ .Release.Name }}
