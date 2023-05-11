@@ -17,8 +17,15 @@ missionControl:
             - mission-control.demo.local
           secretName: mission-control-tls
 
+# See https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml
 vcluster:
   sync:
+    generic:
+      config: |-
+        version: v1beta1
+        import:
+          - kind: Secret
+            apiVersion: v1
     ingresses:
       enabled: true
   storage:
@@ -28,4 +35,4 @@ vcluster:
       apiVersion: v1
       kind: Namespace
       metadata:
-        name: production
+        name: default
