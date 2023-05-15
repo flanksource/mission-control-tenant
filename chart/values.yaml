@@ -20,12 +20,8 @@ missionControl:
 # See https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml
 vcluster:
   sync:
-    generic:
-      config: |-
-        version: v1beta1
-        import:
-          - kind: Secret
-            apiVersion: v1
+    secrets:
+      all: true
     ingresses:
       enabled: true
   storage:
