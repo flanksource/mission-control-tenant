@@ -26,9 +26,3 @@ vcluster:
       enabled: true
   storage:
     size: 15Gi
-  init:
-    manifests: |-
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: default
