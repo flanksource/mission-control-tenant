@@ -2,6 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: {{ include "mission-control-tenant.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "mission-control-tenant.labels" . | nindent 4 }}
 spec:
