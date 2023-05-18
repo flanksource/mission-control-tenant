@@ -19,6 +19,9 @@ missionControl:
 
 # See https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml
 vcluster:
+  plugin:
+    sync-host-secrets:
+      image: docker.io/flanksource/vcluster-sync-host-secrets:v0.1.4
   sync:
     secrets:
       all: true
