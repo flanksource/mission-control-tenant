@@ -7,7 +7,7 @@ missionControl:
       runMigrations: true
       storageClass: managed
   flanksource-ui:
-    oryKratosURL: https://mission-control.local/kratos
+    oryKratosURL: https://mission-control.local/api/.ory
     ingress:
       annotations:
         kubernetes.io/tls-acme: "true"
