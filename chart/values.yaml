@@ -21,7 +21,7 @@ missionControl:
 vcluster:
   plugin:
     sync-host-secrets:
-      image: docker.io/flanksource/vcluster-sync-host-secrets:v0.1.4
+      image: docker.io/flanksource/vcluster-sync-host-secrets:v0.1.6
   sync:
     secrets:
       all: true
