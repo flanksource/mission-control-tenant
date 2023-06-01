@@ -1,6 +1,7 @@
 nameOverride: ""
 fullnameOverride: ""
 
+missionControlChartVersion: "*"
 missionControl:
   canary-checker:
     db:
