@@ -19,6 +19,9 @@ spec:
   storageNamespace: default
   install:
     createNamespace: true
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
   kubeConfig:
     secretRef:
       name: vc-{{ .Release.Name }}
