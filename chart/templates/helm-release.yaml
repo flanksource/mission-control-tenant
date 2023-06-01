@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: mission-control
-      version: {{ .Values.missionControlChartVersion }}
+      version: {{ .Values.missionControlChartVersion | quote }}
       sourceRef:
         kind: HelmRepository
         name: {{ include "mission-control-tenant.fullname" . }}
