@@ -1,7 +1,7 @@
 nameOverride: ""
 fullnameOverride: ""
 
-missionControlChartVersion: "*"
+missionControlChartVersion: ">=0.0.0"
 missionControl:
   canary-checker:
     db:
