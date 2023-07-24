@@ -1,6 +1,6 @@
 nameOverride: ""
 fullnameOverride: ""
-
+domain: ""
 missionControlChartVersion: ">=0.0.0"
 missionControl:
   canary-checker:
@@ -10,13 +10,7 @@ missionControl:
   flanksource-ui:
     oryKratosURL: https://mission-control.local/api/.ory
     ingress:
-      annotations:
-        kubernetes.io/tls-acme: "true"
-      host: mission-control.local
-      tls:
-        - hosts:
-            - mission-control.demo.local
-          secretName: mission-control-tls
+      enabled: false
 
 # See https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml
 vcluster:
