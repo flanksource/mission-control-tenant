@@ -7,7 +7,8 @@ metadata:
     kubernetes.io/tls-acme: "true"
 spec:
   tls:
-    - hosts: {{ .Values.domain | quote }}
+    - hosts: 
+        - {{ .Values.domain | quote }}
       secretName: mission-control-tls-{{ .Release.Name }}
   rules:
     - host: {{ .Values.domain | quote }}
