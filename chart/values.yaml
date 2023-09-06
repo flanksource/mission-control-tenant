@@ -3,14 +3,13 @@ fullnameOverride: ""
 domain: ""
 missionControlChartVersion: ">=0.0.0"
 missionControl:
-  canary-checker:
-    db:
-      runMigrations: true
-      storageClass: managed
+  authProvider: clerk
+  db:
+    create: false
   flanksource-ui:
-    oryKratosURL: https://mission-control.local/api/.ory
-    ingress:
-      enabled: false
+    enabled: false
+  kratos:
+    enabled: false
 
 # See https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml
 vcluster:
