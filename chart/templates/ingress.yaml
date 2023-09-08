@@ -1,3 +1,31 @@
+{{- if eq .Values.missionControl.authProvider "clerk" -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mission-control-{{.Release.Name}}
+  namespace: {{.Release.Namespace}}
+  annotations:
+    kubernetes.io/tls-acme: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{.Values.domain | quote}}
+    http:
+      paths:
+      - backend:
+          service:
+            name: mission-control-x-default-x-{{.Release.Name}}
+            port:
+              number: 8080
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - {{.Values.domain | quote}}
+    secretName: mission-control-tls-{{.Release.Name}}
+
+{{- else -}}
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,7 +35,7 @@ metadata:
     kubernetes.io/tls-acme: "true"
 spec:
   tls:
-    - hosts: 
+    - hosts:
         - {{ .Values.domain | quote }}
       secretName: mission-control-tls-{{ .Release.Name }}
   rules:
@@ -21,3 +49,4 @@ spec:
                 name: incident-manager-ui-x-default-x-{{ .Release.Name }}
                 port:
                   number: 80
+{{- end -}}
