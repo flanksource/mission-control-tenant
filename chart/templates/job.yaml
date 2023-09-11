@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: postgres-secret-sync
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: postgres-secret-sync
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+- kind: ServiceAccount
+  name: postgres-secret-sync
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-secret-sync
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+data:
+  script.sh: |
+    #!/bin/bash
+    set -x
+
+    ADDR_ADMIN="postgres://$ADMIN_USER:$ADMIN_PASSWORD@$DB_HOST:5432/$ADMIN_DB"
+    ADDR_ADMIN_WITH_NEW_DB="postgres://$ADMIN_USER:$ADMIN_PASSWORD@$DB_HOST:5432/$NEW_DB"
+    ADDR_FOR_SECRET="postgres://$NEW_USER:$NEW_PASS@$DB_HOST:5432/$NEW_DB?sslmode=disable"
+
+    psql $ADDR_ADMIN -c "CREATE DATABASE $NEW_DB;"
+    psql $ADDR_ADMIN -c "CREATE USER $NEW_USER WITH CREATEROLE ENCRYPTED PASSWORD '$NEW_PASS';"
+    psql $ADDR_ADMIN -c "GRANT ALL PRIVILEGES ON DATABASE $NEW_DB TO $NEW_USER;"
+    psql $ADDR_ADMIN_WITH_NEW_DB -c "GRANT ALL ON SCHEMA public TO $NEW_USER;"
+
+    kubectl -n $NAMESPACE create secret generic incident-commander-postgres \
+        --from-literal=DB_URL=$ADDR_FOR_SECRET \
+        --from-literal=POSTGRES_HOST=$DB_HOST \
+        --from-literal=POSTGRES_USER=$NEW_USER \
+        --from-literal=POSTGRES_PASSWORD=$NEW_PASS \
+        --from-literal=SSLMODE=disable
+
+    kubectl -n $NAMESPACE annotate secret incident-commander-postgres 'com.flanksource/vcluster-sync=true'
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-secret-sync
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+spec:
+  parallelism: 1    
+  completions: 1    
+  template:         
+    metadata:
+      name: postgres-secret-sync
+    spec:
+      restartPolicy: Never
+      volumes:
+      - name: scripts
+        configMap:
+          name: postgres-secret-sync
+          defaultMode: 0777
+      serviceAccountName: postgres-secret-sync
+      containers:
+      - command:
+        - ./scripts/script.sh
+        image: docker.io/yashmehrotra/postgres-secret-sync:latest
+        name: postgres-secret-sync
+        env:
+        - name: ADMIN_USER
+          value: postgres
+        - name: ADMIN_PASSWORD
+          value: postgrespassword
+        - name: DB_HOST
+          value: 20.19.4.241
+        - name: NEW_DB
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username
+        - name: NEW_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username
+        - name: NEW_PASS
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+          - mountPath: /scripts
+            name: scripts
