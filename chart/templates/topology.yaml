@@ -1,0 +1,343 @@
+---
+apiVersion: mission-control.flanksource.com/v1
+kind: Connection
+metadata:
+  name: mission-control
+  namespace: {{ .Release.Namespace}}
+spec:
+  type: postgres
+  url:
+    value: $(username)
+  username:
+    valueFrom:
+      secretKeyRef:
+        name: incident-commander-postgres
+        key: DB_URL
+---
+apiVersion: canaries.flanksource.com/v1
+kind: Topology
+metadata:
+  name: t-{{ .Values.tenantSlug }}
+  namespace: {{ .Release.Namespace}}
+spec:
+  icon: mission-control
+  schedule: '@every 10m'
+  type: Topology
+  properties:
+  - name: URL
+    type: url
+    configLookup:
+      config:
+        name: mission-control-{{ .Release.Namespace}}
+        type: Kubernetes::Ingress
+      display:
+        javascript: config.spec.rules[0].host
+  - name: Users
+    lookup:
+      postgres:
+      - connection: connection://postgres/mission-control
+        query: SELECT COUNT(*) FROM people WHERE name != 'System' 
+        display:
+          expr: results.rows[0].count
+  - name: CPU
+    lookup:
+      prometheus:
+      - query: '1000 * max(rate(container_cpu_usage_seconds_total{container!="",namespace="{{ .Release.Namespace}}"}[5m]))'
+        url: 'http://prometheus-k8s.monitoring:9090'
+        display:
+          expr: |
+            [{'name': 'CPU', 'value': int(results[0].value), 'headline': true, 'unit': 'millicores'}].toJSON()
+  - name: Memory
+    lookup:
+      prometheus:
+      - query: 'max(avg_over_time(container_memory_working_set_bytes{container!="",namespace="{{ .Release.Namespace}}"}[5m]))'
+        url: 'http://prometheus-k8s.monitoring:9090'
+        display:
+          expr: |
+            [{'name': 'Memory', 'value': int(results[0].value), 'headline': true, 'unit': 'bytes'}].toJSON()
+  - name: Org ID
+    text: {{ .Values.missionControl.clerkOrgID }}
+  components:
+  - components:
+    - icon: group
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            javascript: |
+              JSON.stringify(results.rows.map(function(r) {return {name: r.name}}))
+          name: Team names query
+          query: SELECT name FROM teams
+      name: Teams
+      type: lookup
+    icon: incidents
+    name: Incident Commander
+    checks:
+    - inline:
+        http:
+        - endpoint: http://mission-control-x-default-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/health
+          name: incident-commander-{{ .Release.Namespace}}
+          responseCodes:
+          - 200
+        schedule: '@every 5m'
+    properties:
+    - headline: true
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            expr: results.rows[0].count
+          name: Incident count query
+          query: SELECT count(*) FROM incidents WHERE (resolved IS NULL) OR (closed IS NULL)
+      name: Incidents
+    - name: Docs
+      text: https://docs.flanksource.com
+      type: url
+    - configLookup:
+        config:
+          tags:
+            app.kubernetes.io/name: mission-control
+          type: Kubernetes::Pod
+          namespace: {{ .Release.Namespace}}
+        display:
+          javascript: |
+            config.spec.containers[0]['image'].split(':')[1]
+      headline: true
+      name: Version
+    selectors:
+    - labelSelector: app.kubernetes.io/name=mission-control,namespace={{ .Release.Namespace}}
+      name: pods
+    type: API
+  - checks:
+    - inline:
+        http:
+        - endpoint: http://canary-checker-x-default-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/health
+          name: canary-checker-{{ .Release.Namespace}}
+          responseCodes:
+          - 200
+        schedule: '@every 5m'
+    components:
+    - forEach:
+        properties:
+        - name: Type
+          text: SystemTemplate
+      icon: k8s-customresourcedefinition
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            javascript: |
+              JSON.stringify(results.rows.map(function(r) {return {
+                name: r.name,
+                properties: [
+                {
+                  name: 'Last runtime',
+                  text: r.time_end,
+                },
+                {
+                  name: 'Duration',
+                  text: r.duration_millis,
+                  unit: 'ms',
+                  headline: true,
+                },
+                {
+                  name: 'Success Count',
+                  text: r.success_count,
+                  headline: true,
+                },
+                {
+                  name: 'Error Count',
+                  text: r.error_count,
+                  headline: true,
+                },
+              ],
+              }}))
+          name: Topologies count query
+          query: |
+            SELECT * FROM (
+              SELECT
+                ROW_NUMBER() OVER (PARTITION BY t.name ORDER BY time_end DESC) AS rn, t.name, jh.status, jh.success_count,
+                jh.error_count, jh.duration_millis, jh.time_end
+              FROM topologies t
+              INNER JOIN job_history jh ON t.id::text = jh.resource_id) AS s WHERE rn = 1
+      name: Topologies
+      type: lookup
+    icon: heart
+    name: Canary Checker
+    properties:
+    - headline: true
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            expr: results.rows[0].count
+          name: Component count query
+          query: SELECT count(*) FROM components WHERE deleted_at IS NULL
+      name: Components
+    - headline: true
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            javascript: results.rows[0].count
+          name: Check count query
+          query: SELECT COUNT(*) FROM checks WHERE deleted_at IS NULL
+      name: Checks
+    - name: Docs
+      text: https://docs.flanksource.com/canary-checker/overview
+      type: url
+    - configLookup:
+        config:
+          tags:
+            app.kubernetes.io/name: canary-checker
+          type: Kubernetes::Pod
+          namespace: {{ .Release.Namespace}}
+        display:
+          javascript: |
+            config.spec.containers[0]['image'].split(':')[1]
+      headline: true
+      name: Version
+    selectors:
+    - labelSelector: app.kubernetes.io/name=canary-checker,namespace={{ .Release.Namespace}}
+      name: pods
+    type: API
+  - icon: logs
+    name: APM Hub
+    properties:
+    - headline: true
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            javascript: results.rows[0].count
+          name: Backends count query
+          query: SELECT count(*) FROM logging_backends WHERE deleted_at IS NULL
+      name: Backends
+    - configLookup:
+        config:
+          tags:
+            app.kubernetes.io/name: apm-hub
+          type: Kubernetes::Pod
+          namespace: {{ .Release.Namespace}}
+        display:
+          javascript: |
+            config.spec.containers[0]['image'].split(':')[1]
+      headline: true
+      name: Version
+    - name: Docs
+      text: https://docs.flanksource.com/apm-hub/overview
+      type: url
+    selectors:
+    - labelSelector: app.kubernetes.io/name=apm-hub,namespace={{ .Release.Namespace}}
+      name: pods
+    type: API
+  - checks:
+    - inline:
+        http:
+        - endpoint: http://config-db-x-default-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/live
+          name: config-db-{{ .Release.Namespace}}
+          responseCodes:
+          - 200
+        schedule: '@every 5m'
+    components:
+    - icon: k8s-customresourcedefinition
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            javascript: |
+              JSON.stringify(results.rows.map(function(r) {return {
+                name: r.name,
+                properties: [
+                {
+                  name: 'Last runtime',
+                  text: r.time_end,
+                },
+                {
+                  name: 'Duration',
+                  text: r.duration_millis,
+                  unit: 'ms',
+                  headline: true,
+                },
+                {
+                  name: 'Success Count',
+                  text: r.success_count,
+                  headline: true,
+                },
+                {
+                  name: 'Error Count',
+                  text: r.error_count,
+                  headline: true,
+                },
+              ],
+              }}))
+          name: Config scrapers count query
+          query: |
+            SELECT * FROM (
+              SELECT
+                ROW_NUMBER() OVER (PARTITION BY c.name ORDER BY time_end DESC) AS rn, c.name, jh.status, jh.success_count,
+                jh.error_count, jh.duration_millis, jh.time_end
+              FROM config_scrapers c
+              INNER JOIN job_history jh ON c.id::text = jh.resource_id) AS s WHERE rn = 1
+      name: ConfigScrapers
+      type: lookup
+    icon: config
+    name: Config DB
+    properties:
+    - headline: true
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            expr: results.rows[0].count
+          name: Config Items count query
+          query: SELECT count(*) FROM config_items WHERE deleted_at IS NULL
+      name: Config Items
+    - configLookup:
+        config:
+          tags:
+            app.kubernetes.io/name: config-db
+          type: Kubernetes::Pod
+          namespace: {{ .Release.Namespace}}
+        display:
+          javascript: |
+            config.spec.containers[0]['image'].split(':')[1]
+      headline: true
+      name: Version
+    - name: Docs
+      text: https://docs.flanksource.com/config-db/overview
+      type: url
+    selectors:
+    - labelSelector: app.kubernetes.io/name=config-db,namespace={{ .Release.Namespace}}
+      name: pods
+    type: API
+  - icon: postgres
+    name: PostgreSQL
+    properties:
+    - lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            expr: results.rows[0].version
+          name: Version query
+          query: SELECT VERSION()
+      name: Version
+    - headline: true
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            expr: results.rows[0].pg_size_pretty
+          name: Size query
+          query: SELECT pg_size_pretty(pg_database_size('{{ .Values.missionControl.clerkOrgID }}'))
+      name: Size
+    - headline: true
+      lookup:
+        postgres:
+        - connection: connection://postgres/mission-control
+          display:
+            expr: results.rows[0].sum
+          name: Active connections query
+          query: SELECT sum(numbackends) FROM pg_stat_database WHERE datname = '{{ .Values.missionControl.clerkOrgID }}'
+      name: Connections
+    type: Database
