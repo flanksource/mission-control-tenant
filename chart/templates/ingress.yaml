@@ -6,7 +6,6 @@ metadata:
   namespace: {{.Release.Namespace}}
   annotations:
     kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: ingress-nginx
     cert-manager.io/cluster-issuer: ingress-ca
 spec:
   ingressClassName: ingress-nginx
@@ -35,13 +34,13 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: ingress-nginx
     cert-manager.io/cluster-issuer: ingress-ca
 spec:
   tls:
     - hosts:
         - {{ .Values.domain | quote }}
       secretName: mission-control-tls-{{ .Release.Name }}
+  ingressClassName: ingress-nginx
   rules:
     - host: {{ .Values.domain | quote }}
       http:
