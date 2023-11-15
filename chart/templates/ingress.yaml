@@ -9,7 +9,7 @@ metadata:
     kubernetes.io/ingress.class: ingress-nginx
     cert-manager.io/cluster-issuer: ingress-ca
 spec:
-  ingressClassName: nginx
+  ingressClassName: ingress-nginx
   rules:
   - host: {{.Values.domain | quote}}
     http:
