@@ -11,8 +11,14 @@ missionControl:
     create: false
   flanksource-ui:
     enabled: false
+  apm-hub:
+    enabled: false
   kratos:
     enabled: false
+  properties:
+    incidents.disable: 'true'
+    logs.disable: 'true'
+    settings.logging_backends.disable: 'true'
 
 # See https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml
 vcluster:
