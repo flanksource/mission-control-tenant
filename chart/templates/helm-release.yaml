@@ -28,5 +28,6 @@ spec:
       key: config
   {{- with .Values.missionControl }}
   values:
+    adminPassword: {{ randAlphaNum 16 }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
