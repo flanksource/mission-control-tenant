@@ -329,7 +329,7 @@ spec:
           display:
             expr: results.rows[0].pg_size_pretty
           name: Size query
-          query: SELECT pg_size_pretty(pg_database_size('{{ .Values.missionControl.clerkOrgID }}'))
+          query: SELECT pg_size_pretty(pg_database_size('{{ lower .Values.missionControl.clerkOrgID }}'))
       name: Size
     - headline: true
       lookup:
@@ -338,6 +338,6 @@ spec:
           display:
             expr: results.rows[0].sum
           name: Active connections query
-          query: SELECT sum(numbackends) FROM pg_stat_database WHERE datname = '{{ .Values.missionControl.clerkOrgID }}'
+          query: SELECT sum(numbackends) FROM pg_stat_database WHERE datname = '{{ lower .Values.missionControl.clerkOrgID }}'
       name: Connections
     type: Database
