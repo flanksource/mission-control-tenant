@@ -203,12 +203,12 @@ spec:
         - connection: connection://postgres/mission-control
           display:
             expr: results.rows[0].count
-          query: SELECT COUNT(*)/(30*24) AS count FROM check_statuses WHERE (NOW() - created_at) > INTERVAL '30 days'
+          query: SELECT ROUND(COUNT(*)/(30*24.0), 2) AS count FROM check_statuses WHERE (NOW() - created_at) > INTERVAL '30 days'
     - name: Check Executions / Day
       lookup:
         postgres:
         - connection: connection://postgres/mission-control
-          query: SELECT COUNT(*)/30 FROM AS count check_statuses WHERE (NOW() - created_at) > INTERVAL '30 days'
+          query: SELECT ROUND(COUNT(*)/(30.0), 2) AS count FROM check_statuses WHERE (NOW() - created_at) > INTERVAL '30 days'
           display:
             expr: results.rows[0].count
 
