@@ -7,6 +7,7 @@ missionControl:
   authProvider: clerk
   clerkJWKSURL: ""
   clerkOrgID: ""
+  otel_collector: grafana-agent-traces.default:4317
   db:
     create: false
   flanksource-ui:
@@ -32,3 +33,9 @@ vcluster:
       enabled: true
   storage:
     size: 15Gi
+
+  # Map grafana agent host service to default namespace in tenant to push traces
+  mapService:
+    fromHost:
+      - from: monitoring/grafana-agent-traces
+        to: default/grafana-agent-traces
