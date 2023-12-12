@@ -35,7 +35,7 @@ vcluster:
     size: 15Gi
 
   # Map grafana agent host service to default namespace in tenant to push traces
-  mapService:
+  mapServices:
     fromHost:
       - from: monitoring/grafana-agent-traces
         to: default/grafana-agent-traces
