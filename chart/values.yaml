@@ -7,11 +7,18 @@ missionControl:
   authProvider: clerk
   clerkJWKSURL: ""
   clerkOrgID: ""
-  otel_collector: grafana-agent-traces.default:4317
+  global:
+    otel:
+      collector: grafana-agent-traces.default:4317
+  otel:
+    serviceName: mission-control-{{.Release.Namespace}}
   db:
     create: false
   flanksource-ui:
     enabled: false
+  canary-checker:
+    otel:
+      serviceName: canary-checker-{{.Release.Namespace}}
   apm-hub:
     enabled: false
   kratos:
