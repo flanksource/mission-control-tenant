@@ -112,7 +112,8 @@ spec:
       headline: true
       name: Version
     selectors:
-    - labelSelector: app.kubernetes.io/name=mission-control,namespace={{ .Release.Namespace}}
+    - labelSelector: app.kubernetes.io/name=mission-control
+      fieldSelector: namespace={{ .Release.Namespace}}
     type: API
   - checks:
     - inline:
@@ -226,7 +227,8 @@ spec:
       headline: true
       name: Version
     selectors:
-    - labelSelector: app.kubernetes.io/name=canary-checker,namespace={{ .Release.Namespace}}
+    - labelSelector: app.kubernetes.io/name=canary-checker
+      fieldSelector: namespace={{ .Release.Namespace}}
     type: API
   - icon: logs
     name: APM Hub
@@ -255,7 +257,8 @@ spec:
       text: https://docs.flanksource.com/apm-hub/overview
       type: url
     selectors:
-    - labelSelector: app.kubernetes.io/name=apm-hub,namespace={{ .Release.Namespace}}
+    - labelSelector: app.kubernetes.io/name=apm-hub
+      fieldSelector: namespace={{ .Release.Namespace}}
     type: API
   - checks:
     - inline:
@@ -334,7 +337,8 @@ spec:
       text: https://docs.flanksource.com/config-db/overview
       type: url
     selectors:
-    - labelSelector: app.kubernetes.io/name=config-db,namespace={{ .Release.Namespace}}
+    - labelSelector: app.kubernetes.io/name=config-db
+      fieldSelector: namespace={{ .Release.Namespace}}
     type: API
   - icon: postgres
     name: PostgreSQL
