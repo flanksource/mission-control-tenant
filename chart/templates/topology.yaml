@@ -113,7 +113,7 @@ spec:
       name: Version
     selectors:
     - labelSelector: app.kubernetes.io/name=mission-control
-      fieldSelector: namespace={{ .Release.Namespace}}
+      namespace: {{.Release.Namespace}}
     type: API
   - checks:
     - inline:
@@ -228,7 +228,7 @@ spec:
       name: Version
     selectors:
     - labelSelector: app.kubernetes.io/name=canary-checker
-      fieldSelector: namespace={{ .Release.Namespace}}
+      namespace: {{.Release.Namespace}}
     type: API
   - icon: logs
     name: APM Hub
@@ -258,7 +258,7 @@ spec:
       type: url
     selectors:
     - labelSelector: app.kubernetes.io/name=apm-hub
-      fieldSelector: namespace={{ .Release.Namespace}}
+      namespace: {{.Release.Namespace}}
     type: API
   - checks:
     - inline:
@@ -338,7 +338,7 @@ spec:
       type: url
     selectors:
     - labelSelector: app.kubernetes.io/name=config-db
-      fieldSelector: namespace={{ .Release.Namespace}}
+      namespace: {{.Release.Namespace}}
     type: API
   - icon: postgres
     name: PostgreSQL
