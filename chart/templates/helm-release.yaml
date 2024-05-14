@@ -27,6 +27,9 @@ spec:
       name: vc-{{ .Release.Name }}
       key: config
   {{- with .Values.missionControl }}
+    {{- $customValues := dict }}
+    {{- $_ := set $customValues "global" (dict "otel" (dict "labels" (printf "org.id=%s,tenant.slug=%s" .clerkOrgID .tenantSlug))) }}
+    {{- $mergedValues := mergeOverwrite . $customValues }}
   values:
-    {{- toYaml . | nindent 4 }}
+    {{- toYaml $mergedValues | nindent 4 }}
   {{- end }}
