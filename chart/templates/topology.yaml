@@ -230,6 +230,7 @@ spec:
     - labelSelector: app.kubernetes.io/name=canary-checker
       namespace: {{.Release.Namespace}}
     type: API
+
   - icon: logs
     name: APM Hub
     properties:
@@ -260,6 +261,8 @@ spec:
     - labelSelector: app.kubernetes.io/name=apm-hub
       namespace: {{.Release.Namespace}}
     type: API
+
+  # Config DB
   - checks:
     - inline:
         http:
@@ -340,8 +343,10 @@ spec:
     - labelSelector: app.kubernetes.io/name=config-db
       namespace: {{.Release.Namespace}}
     type: API
-  - icon: postgres
-    name: PostgreSQL
+
+  # PostgreSQL
+  - name: PostgreSQL
+    icon: postgres
     properties:
     - lookup:
         postgres:
@@ -370,3 +375,105 @@ spec:
           query: SELECT sum(numbackends) FROM pg_stat_database WHERE datname = '{{ lower .Values.missionControl.clerkOrgID }}'
       name: Connections
     type: Database
+
+  # Jobs
+  - name: Jobs
+    type: Jobs
+    icon: clock
+    components:
+    - name: JobGroups
+      lookup:
+        postgres:
+        - connection: connection://{{.Release.Namespace}}/mission-control
+          query: |
+            WITH ordered_history AS (
+              SELECT
+                job_history.*,
+                ROW_NUMBER() OVER (PARTITION by name, resource_type, resource_id ORDER BY created_at DESC) AS rn
+              FROM job_history
+              WHERE status NOT IN ('RUNNING', 'SKIPPED')
+            )
+            SELECT * from ordered_history where rn = 1 and resource_id = '';
+          display:
+            expr: |
+              results.rows.map(r, {
+                'name': r.name,
+                'icon': 'clock',
+                'type': 'JobHistory',
+                'status': r.status in ['SUCCESS', 'FINISHED'] ? 'healthy': 'unhealthy',
+                'status_reason': r.status in ['SUCCESS', 'FINISHED'] ? '': r.details.toJSON(),
+                'properties': [
+                  {'name': 'success_count', 'value': r.success_count, 'headline': true},
+                  {'name': 'error_count', 'value': r.error_count, 'headline': true},
+                  {'name': 'duration_ms', 'value': r.duration_millis},
+                  {'name': 'last_run', 'text': string(r.time_end)},
+                  {'name': 'count'},
+                  {'name': 'rate/hr'},
+                  {'name': 'pass rate'},
+                ],
+              }).toJSON()
+
+      properties:
+        - name: count
+          lookup:
+            prometheus:
+            - query: 'count by (name) (job{namespace="{{ .Release.Namespace}}"})'
+              url: {{ .Values.prometheusURL | quote }}
+              display:
+                expr: |
+                  dyn(results).map(r, {
+                    'name': r.name,
+                    'properties': [{'name': 'count', 'value': int(r.value)}]
+                  }).toJSON()
+        - name: rate
+          lookup:
+            prometheus:
+            - query: 'sum(increase(job{namespace="{{ .Release.Namespace}}"}[1h])) by (name)'
+              url: {{ .Values.prometheusURL | quote }}
+              display:
+                expr: |
+                  dyn(results).map(r, {
+                    'name': r.name,
+                    'properties': [{'name': 'rate/hr', 'value': math.Ceil(int(r.value))}]
+                  }).toJSON()
+
+        - name: pass-rate
+          lookup:
+            prometheus:
+            - query: '100 * sum by (name) (count_over_time(job{namespace="{{ .Release.Namespace}}",status=~"FINISHED|SUCCESS"}[1h])) / sum by (name) (count_over_time(job{namespace="{{ .Release.Namespace}}"}[1h]))'
+              url: {{ .Values.prometheusURL | quote }}
+              display:
+                expr: |
+                  dyn(results).map(r, {
+                    'name': r.name,
+                    'properties': [{'name': 'pass rate', 'value': int(r.value)}]
+                  }).toJSON()
+
+  # Event Queue
+  - name: Event Queue
+    icon: switch
+    properties:
+    - name: Backlog
+      lookup:
+        postgres:
+        - query: SELECT count(*) FROM event_queue
+          connection: connection://{{.Release.Namespace}}/mission-control
+          display:
+            expr: results.rows[0].count
+          test:
+            expr: results.rows[0].count < 200
+    checks:
+    - inline:
+        postgres:
+        - query: SELECT distinct(name), count(*) FROM event_queue GROUP BY name
+          connection: connection://{{.Release.Namespace}}/mission-control
+          name: Event Queue Checks
+          transformDeleteStrategy: MarkHealthy
+          transform:
+            expr: |
+              results.rows.map(r, {
+                'name': r.name,
+                'icon': 'switch',
+                'message': string(r.count) + ' items in queue',
+                'pass': r.count < 200,
+              }).toJSON()
