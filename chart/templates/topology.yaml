@@ -147,7 +147,7 @@ spec:
                 'properties': [
                   {'name': 'Last runtime', 'text': r.time_end},
                   {'name': 'Duration', 'text': r.duration_millis, 'unit': 'ms', 'headline': true},
-                  {'name': 'Success Count', 'text': r.success_count, 'headline': true},
+                  {'name': 'Success Count', 'text': string(r.success_count), 'headline': true},
                   {'name': 'Error Count', 'text': string(r.error_count), 'headline': true},
                 ],
               }).toJSON()
@@ -276,7 +276,7 @@ spec:
                 'properties': [
                   {'name': 'Last runtime', 'text': r.time_end},
                   {'name': 'Duration', 'text': r.duration_millis, 'unit': 'ms', 'headline': true},
-                  {'name': 'Success Count', 'text': r.success_count, 'headline': true},
+                  {'name': 'Success Count', 'text': string(r.success_count), 'headline': true},
                   {'name': 'Error Count', 'text': string(r.error_count), 'headline': true},
                 ],
               }).toJSON()
