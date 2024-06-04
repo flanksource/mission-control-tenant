@@ -39,17 +39,24 @@ spec:
         query: SELECT COUNT(*) FROM people WHERE name != 'System' 
         display:
           expr: results.rows[0].count
+  - name: Error Rate
+    lookup:
+      prometheus:
+      - query: '100 * sum by (namespace) (increase(echo_requests_total{code=~"5..",namespace="{{.Release.Namespace}}"}[24h])) / sum by (namespace) (increase(echo_requests_total{namespace="{{.Release.Namespace}}"}[24h]))'
+        display:
+          expr: |
+            [{'name': 'Error Rate', 'value': int(results[0].value), 'headline': true}].toJSON()
   - name: CPU
     lookup:
       prometheus:
-      - query: '1000 * max(rate(container_cpu_usage_seconds_total{container!="",namespace="{{ .Release.Namespace}}"}[5m]))'
+      - query: '1000 * max(rate(container_cpu_usage_seconds_total{container!="",namespace="{{.Release.Namespace}}"}[5m]))'
         display:
           expr: |
             [{'name': 'CPU', 'value': int(results[0].value), 'headline': true, 'unit': 'millicores'}].toJSON()
   - name: Memory
     lookup:
       prometheus:
-      - query: 'max(avg_over_time(container_memory_working_set_bytes{container!="",namespace="{{ .Release.Namespace}}"}[5m]))'
+      - query: 'max(avg_over_time(container_memory_working_set_bytes{container!="",namespace="{{.Release.Namespace}}"}[5m]))'
         display:
           expr: |
             [{'name': 'Memory', 'value': int(results[0].value), 'headline': true, 'unit': 'bytes'}].toJSON()
@@ -64,6 +71,7 @@ spec:
           expr: results.rows[0].max
   - name: Namespace
     text: {{ .Release.Namespace }}
+
   components:
   - components:
     - icon: group
