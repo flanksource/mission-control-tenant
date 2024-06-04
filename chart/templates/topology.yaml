@@ -141,32 +141,17 @@ spec:
         postgres:
         - connection: connection://{{.Release.Namespace}}/mission-control
           display:
-            javascript: |
-              JSON.stringify(results.rows.map(function(r) {return {
-                name: r.name,
-                properties: [
-                {
-                  name: 'Last runtime',
-                  text: r.time_end,
-                },
-                {
-                  name: 'Duration',
-                  text: r.duration_millis,
-                  unit: 'ms',
-                  headline: true,
-                },
-                {
-                  name: 'Success Count',
-                  text: r.success_count,
-                  headline: true,
-                },
-                {
-                  name: 'Error Count',
-                  text: r.error_count,
-                  headline: true,
-                },
-              ],
-              }}))
+            expr: |
+              results.rows.map(r, {
+                'name': r.name,
+                'properties': [
+                  {'name': 'Last runtime', 'text': r.time_end},
+                  {'name': 'Duration', 'text': r.duration_millis, 'unit': 'ms', 'headline': true},
+                  {'name': 'Success Count', 'text': r.success_count, 'headline': true},
+                  {'name': 'Error Count', 'text': string(r.error_count), 'headline': true},
+                ],
+              }).toJSON()
+
           name: Topologies count query
           query: |
             SELECT * FROM (
@@ -287,13 +272,13 @@ spec:
           display:
             expr: |
               results.rows.map(r, {
-                name: r.name,
-                properties: [
-                {'name': 'Last runtime', 'text': r.time_end},
-                {'name': 'Duration', 'text': r.duration_millis, 'unit': 'ms', 'headline': true},
-                {'name': 'Success Count', 'text': r.success_count, 'headline': true},
-                {'name': 'Error Count', 'text': string(r.error_count), 'headline': true},
-              ],
+                'name': r.name,
+                'properties': [
+                  {'name': 'Last runtime', 'text': r.time_end},
+                  {'name': 'Duration', 'text': r.duration_millis, 'unit': 'ms', 'headline': true},
+                  {'name': 'Success Count', 'text': r.success_count, 'headline': true},
+                  {'name': 'Error Count', 'text': string(r.error_count), 'headline': true},
+                ],
               }).toJSON()
           name: Config scrapers count query
           query: |
