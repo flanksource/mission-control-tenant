@@ -285,32 +285,16 @@ spec:
         postgres:
         - connection: connection://{{.Release.Namespace}}/mission-control
           display:
-            javascript: |
-              JSON.stringify(results.rows.map(function(r) {return {
+            expr: |
+              results.rows.map(r, {
                 name: r.name,
                 properties: [
-                {
-                  name: 'Last runtime',
-                  text: r.time_end,
-                },
-                {
-                  name: 'Duration',
-                  text: r.duration_millis,
-                  unit: 'ms',
-                  headline: true,
-                },
-                {
-                  name: 'Success Count',
-                  text: r.success_count,
-                  headline: true,
-                },
-                {
-                  name: 'Error Count',
-                  text: r.error_count,
-                  headline: true,
-                },
+                {'name': 'Last runtime', 'text': r.time_end},
+                {'name': 'Duration', 'text': r.duration_millis, 'unit': 'ms', 'headline': true},
+                {'name': 'Success Count', 'text': r.success_count, 'headline': true},
+                {'name': 'Error Count', 'text': string(r.error_count), 'headline': true},
               ],
-              }}))
+              }).toJSON()
           name: Config scrapers count query
           query: |
             SELECT * FROM (
@@ -399,7 +383,7 @@ spec:
                 job_history.*,
                 ROW_NUMBER() OVER (PARTITION by name, resource_type, resource_id ORDER BY created_at DESC) AS rn
               FROM job_history
-              WHERE status NOT IN ('RUNNING', 'SKIPPED')
+              WHERE status NOT IN ('RUNNING', 'SKIPPED', 'STALE')
             )
             SELECT * from ordered_history where rn = 1 and resource_id = '';
           display:
