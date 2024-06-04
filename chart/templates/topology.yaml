@@ -42,7 +42,8 @@ spec:
   - name: Error Rate
     lookup:
       prometheus:
-      - query: '100 * sum by (namespace) (increase(echo_requests_total{code=~"5..",namespace="{{.Release.Namespace}}"}[24h])) / sum by (namespace) (increase(echo_requests_total{namespace="{{.Release.Namespace}}"}[24h]))'
+      # or vector(0) is added to give a 0 value instead of empty result so that CEL won't error
+      - query: '100 * sum by (namespace) (increase(echo_requests_total{code=~"5..",namespace="{{.Release.Namespace}}"}[24h])) / sum by (namespace) (increase(echo_requests_total{namespace="{{.Release.Namespace}}"}[24h])) or vector(0)'
         display:
           expr: |
             [{'name': 'Error Rate', 'value': int(results[0].value), 'headline': true}].toJSON()
