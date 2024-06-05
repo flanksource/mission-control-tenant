@@ -22,7 +22,7 @@ metadata:
 spec:
   icon: mission-control
   schedule: '@every 10m'
-  type: Topology
+  type: Tenant
   properties:
   - name: URL
     type: url
