@@ -27,8 +27,15 @@ spec:
       name: vc-{{ .Release.Name }}
       key: config
   {{- with .Values.missionControl }}
+    {{- $global := $ }}
     {{- $customValues := dict }}
-    {{- $_ := set $customValues "global" (dict "otel" (dict "labels" (printf "org.id=%s,tenant.slug=%s" .clerkOrgID .tenantSlug))) }}
+
+    {{- $otelDict := dict "otel" (dict "labels" (printf "org.id=%s,tenant.slug=%s" .clerkOrgID $global.Values.tenantSlug)) }}
+    {{- $labelsDict := dict "labels" (dict "flanksource.com/clerk-org-id" .clerkOrgID ) }}
+
+    {{- $globalDict := dict "global" (merge (dict "otel" (dict "labels" $otelDict.otel.labels)) $labelsDict) }}
+
+    {{- $_ := set $customValues "global" $globalDict.global }}
     {{- $mergedValues := mergeOverwrite . $customValues }}
   values:
     {{- toYaml $mergedValues | nindent 4 }}
