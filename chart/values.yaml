@@ -8,6 +8,8 @@ missionControl:
   clerkJWKSURL: ""
   clerkOrgID: ""
   global:
+    labels:
+      flanksource.com/clerk-org-id: ''
     otel:
       collector: grafana-agent-traces.default:4317
   db:
