@@ -31,7 +31,7 @@ spec:
         name: mission-control-{{ .Release.Namespace}}
         type: Kubernetes::Ingress
       display:
-        javascript: config.spec.rules[0].host
+        expr: config.spec.rules[0].host
   - name: Users
     lookup:
       postgres:
@@ -80,8 +80,8 @@ spec:
         postgres:
         - connection: connection://{{.Release.Namespace}}/mission-control
           display:
-            javascript: |
-              JSON.stringify(results.rows.map(function(r) {return {name: r.name}}))
+            expr: |
+              results.rows.map(r, {'name': r.name}).toJSON()
           name: Team names query
           query: SELECT name FROM teams
       name: Teams
@@ -116,7 +116,7 @@ spec:
           type: Kubernetes::Pod
           namespace: {{ .Release.Namespace}}
         display:
-          javascript: |
+          expr: |
             config.spec.containers[0]['image'].split(':')[1]
       headline: true
       name: Version
@@ -218,7 +218,7 @@ spec:
           type: Kubernetes::Pod
           namespace: {{ .Release.Namespace}}
         display:
-          javascript: |
+          expr: |
             config.spec.containers[0]['image'].split(':')[1]
       headline: true
       name: Version
@@ -235,7 +235,7 @@ spec:
         postgres:
         - connection: connection://{{.Release.Namespace}}/mission-control
           display:
-            javascript: results.rows[0].count
+            expr: results.rows[0].count
           name: Backends count query
           query: SELECT count(*) FROM logging_backends WHERE deleted_at IS NULL
       name: Backends
@@ -246,7 +246,7 @@ spec:
           type: Kubernetes::Pod
           namespace: {{ .Release.Namespace}}
         display:
-          javascript: |
+          expr: |
             config.spec.containers[0]['image'].split(':')[1]
       headline: true
       name: Version
@@ -314,7 +314,7 @@ spec:
           type: Kubernetes::Pod
           namespace: {{ .Release.Namespace}}
         display:
-          javascript: |
+          expr: |
             config.spec.containers[0]['image'].split(':')[1]
       headline: true
       name: Version
