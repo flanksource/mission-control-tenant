@@ -23,6 +23,8 @@ spec:
   icon: mission-control
   schedule: '@every 10m'
   type: Tenant
+  push:
+    url: {{.Values.telemetryPushURL | quote}}
   properties:
   - name: URL
     type: url
