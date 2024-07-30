@@ -22,6 +22,7 @@ missionControl:
   kratos:
     enabled: false
   properties:
+    log.kubeproxy: 'true'
     incidents.disable: 'true'
     logs.disable: 'true'
     settings.logging_backends.disable: 'true'

@@ -33,7 +33,7 @@ spec:
     {{- $otelDict := dict "otel" (dict "labels" (printf "org.id=%s,tenant.slug=%s" .clerkOrgID $global.Values.tenantSlug)) }}
     {{- $labelsDict := dict "labels" (dict "flanksource.com/clerk-org-id" .clerkOrgID ) }}
 
-    {{- $globalDict := dict "global" (merge (dict "otel" (dict "labels" $otelDict.otel.labels)) $labelsDict) }}
+    {{- $globalDict := dict "global" (merge (dict "otel" (dict "labels" $otelDict.otel.labels)) $labelsDict (dict "api" (dict "host" $global.Values.domain))) }}
 
     {{- $_ := set $customValues "global" $globalDict.global }}
     {{- $mergedValues := mergeOverwrite . $customValues }}
