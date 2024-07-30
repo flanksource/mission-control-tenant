@@ -147,6 +147,8 @@ spec:
             expr: |
               results.rows.map(r, {
                 'name': r.name,
+                'status': r.status == 'SUCCESS' ? 'healthy' : 'unhealthy',
+                'status_reason': r.status == 'SUCCESS' ? '': r.details.toJSON(),
                 'properties': [
                   {'name': 'Last runtime', 'text': r.time_end},
                   {'name': 'Duration', 'value': r.duration_millis, 'unit': 'ms', 'headline': true},
@@ -160,7 +162,7 @@ spec:
             SELECT * FROM (
               SELECT
                 ROW_NUMBER() OVER (PARTITION BY t.name ORDER BY time_end DESC) AS rn, t.name, jh.status, jh.success_count,
-                jh.error_count, jh.duration_millis, jh.time_end
+                jh.error_count, jh.duration_millis, jh.time_end, jh.details
               FROM topologies t
               INNER JOIN job_history jh ON t.id::text = jh.resource_id
               WHERE jh.status NOT in ('RUNNING', 'STALE', 'SKIPPED')
@@ -278,6 +280,8 @@ spec:
             expr: |
               results.rows.map(r, {
                 'name': r.name,
+                'status': r.status == 'SUCCESS' ? 'healthy' : 'unhealthy',
+                'status_reason': r.status == 'SUCCESS' ? '': r.details.toJSON(),
                 'properties': [
                   {'name': 'Last runtime', 'text': r.time_end},
                   {'name': 'Duration', 'value': r.duration_millis, 'unit': 'ms', 'headline': true},
@@ -290,7 +294,7 @@ spec:
             SELECT * FROM (
               SELECT
                 ROW_NUMBER() OVER (PARTITION BY c.name ORDER BY time_end DESC) AS rn, c.name, jh.status, jh.success_count,
-                jh.error_count, jh.duration_millis, jh.time_end
+                jh.error_count, jh.duration_millis, jh.time_end, jh.details
               FROM config_scrapers c
               INNER JOIN job_history jh ON c.id::text = jh.resource_id
               WHERE jh.status NOT in ('RUNNING', 'STALE', 'SKIPPED')
@@ -384,8 +388,8 @@ spec:
                 'name': r.name,
                 'icon': 'clock',
                 'type': 'JobHistory',
-                'status': r.status in ['SUCCESS', 'FINISHED'] ? 'healthy': 'unhealthy',
-                'status_reason': r.status in ['SUCCESS', 'FINISHED'] ? '': r.details.toJSON(),
+                'status': r.status == 'SUCCESS' ? 'healthy': 'unhealthy',
+                'status_reason': r.status == 'SUCCESS' ? '': r.details.toJSON(),
                 'properties': [
                   {'name': 'success_count', 'value': r.success_count, 'headline': true},
                   {'name': 'error_count', 'value': r.error_count, 'headline': true},
@@ -424,7 +428,7 @@ spec:
         - name: pass-rate
           lookup:
             prometheus:
-            - query: '100 * sum by (name) (count_over_time(job{namespace="{{ .Release.Namespace}}",status=~"FINISHED|SUCCESS"}[1h])) / sum by (name) (count_over_time(job{namespace="{{ .Release.Namespace}}"}[1h]))'
+            - query: '100 * sum by (name) (count_over_time(job{namespace="{{ .Release.Namespace}}",status="SUCCESS"}[1h])) / sum by (name) (count_over_time(job{namespace="{{ .Release.Namespace}}"}[1h]))'
               url: {{ .Values.prometheusURL | quote }}
               display:
                 expr: |
