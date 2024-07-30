@@ -3,6 +3,7 @@ fullnameOverride: ""
 domain: ""
 missionControlChartVersion: ">=0.0.0"
 tenantSlug: ""
+telemetryPushURL: https://telemetry.app.flanksource.com/push/topology
 missionControl:
   authProvider: clerk
   clerkJWKSURL: ""
