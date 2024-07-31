@@ -13,6 +13,9 @@ missionControl:
       flanksource.com/clerk-org-id: ''
     otel:
       collector: grafana-agent-traces.default:4317
+  serviceAccount:
+    rbac:
+      impersonate: true
   db:
     create: false
   flanksource-ui:
