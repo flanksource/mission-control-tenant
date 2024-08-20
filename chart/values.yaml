@@ -9,6 +9,8 @@ missionControl:
   clerkJWKSURL: ""
   clerkOrgID: ""
   global:
+    ui:
+      host: https://app.flanksource.com
     labels:
       flanksource.com/clerk-org-id: ''
     otel:
