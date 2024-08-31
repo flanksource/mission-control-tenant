@@ -10,7 +10,7 @@ missionControl:
   clerkOrgID: ""
   global:
     ui:
-      host: https://app.flanksource.com
+      host: app.flanksource.com
     labels:
       flanksource.com/clerk-org-id: ''
     otel:
