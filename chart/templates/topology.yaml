@@ -7,8 +7,6 @@ metadata:
 spec:
   type: postgres
   url:
-    value: $(username)
-  username:
     valueFrom:
       secretKeyRef:
         name: incident-commander-postgres
