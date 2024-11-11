@@ -28,4 +28,4 @@ spec:
     scraper:
       exclusions:
         labels:
-          app.kubernetes.io/instance=default-{{ .Release.Namespace }}-{{ include "mission-control-tenant.fullname" . }}
+          app.kubernetes.io/instance: default-{{ .Release.Namespace }}-{{ include "mission-control-tenant.fullname" . }}
