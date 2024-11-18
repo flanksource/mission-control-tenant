@@ -14,7 +14,7 @@ missionControl:
     labels:
       flanksource.com/clerk-org-id: ''
     otel:
-      collector: grafana-agent-traces.default:4317
+      collector: grafana-alloy.default:4317
   serviceAccount:
     rbac:
       impersonate: true
@@ -48,5 +48,5 @@ vcluster:
   # Map grafana agent host service to default namespace in tenant to push traces
   mapServices:
     fromHost:
-      - from: monitoring/grafana-agent-traces
-        to: default/grafana-agent-traces
+      - from: monitoring/grafana-alloy
+        to: default/grafana-alloy
