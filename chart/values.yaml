@@ -8,11 +8,13 @@ missionControl:
   authProvider: clerk
   clerkJWKSURL: ""
   clerkOrgID: ""
+  serviceMonitor:
+    enabled: true
   global:
     ui:
       host: app.flanksource.com
     labels:
-      flanksource.com/clerk-org-id: ''
+      flanksource.com/clerk-org-id: ""
     otel:
       collector: grafana-alloy.default:4317
   serviceAccount:
@@ -20,6 +22,9 @@ missionControl:
       impersonate: true
   db:
     create: false
+  config-db:
+    serviceMonitor:
+      enabled: true
   flanksource-ui:
     enabled: false
   apm-hub:
@@ -27,10 +32,10 @@ missionControl:
   kratos:
     enabled: false
   properties:
-    log.kubeproxy: 'true'
-    incidents.disable: 'true'
-    logs.disable: 'true'
-    settings.logging_backends.disable: 'true'
+    log.kubeproxy: "true"
+    incidents.disable: "true"
+    logs.disable: "true"
+    settings.logging_backends.disable: "true"
 
 # See https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml
 vcluster:
