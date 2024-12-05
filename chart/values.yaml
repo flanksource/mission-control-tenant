@@ -8,8 +8,6 @@ missionControl:
   authProvider: clerk
   clerkJWKSURL: ""
   clerkOrgID: ""
-  serviceMonitor:
-    enabled: true
   global:
     ui:
       host: app.flanksource.com
@@ -22,9 +20,6 @@ missionControl:
       impersonate: true
   db:
     create: false
-  config-db:
-    serviceMonitor:
-      enabled: true
   flanksource-ui:
     enabled: false
   apm-hub:

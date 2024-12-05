@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: config-db-{{ .Values.tenantSlug }}-monitor
+spec:
+  endpoints:
+    - port: http
+      interval: 30s
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: config-db
+      vcluster.loft.sh/managed-by: "{{ .Values.tenantSlug }}"
+      vcluster.loft.sh/namespace: default
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mission-control-{{ .Values.tenantSlug }}-monitor
+spec:
+  endpoints:
+    - port: http
+      interval: 30s
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mission-control
+      vcluster.loft.sh/managed-by: "{{ .Values.tenantSlug }}"
+      vcluster.loft.sh/namespace: default
