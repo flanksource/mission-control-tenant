@@ -18,7 +18,7 @@ spec:
       paths:
       - backend:
           service:
-            name: mission-control-x-default-x-{{.Release.Name}}
+            name: mission-control-x-mission-control-x-{{.Release.Name}}
             port:
               number: 8080
         path: /
@@ -55,7 +55,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: incident-manager-ui-x-default-x-{{ .Release.Name }}
+                name: incident-manager-ui-x-mission-control-x-{{ .Release.Name }}
                 port:
                   number: 80
 {{- end -}}

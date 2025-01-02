@@ -91,7 +91,7 @@ spec:
     checks:
     - inline:
         http:
-        - endpoint: http://mission-control-x-default-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/health
+        - endpoint: http://mission-control-x-mission-control-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/health
           name: incident-commander-{{ .Release.Namespace}}
           responseCodes:
           - 200
@@ -127,7 +127,7 @@ spec:
   - checks:
     - inline:
         http:
-        - endpoint: http://canary-checker-x-default-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/health
+        - endpoint: http://canary-checker-x-mission-control-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/health
           name: canary-checker-{{ .Release.Namespace}}
           responseCodes:
           - 200
@@ -264,7 +264,7 @@ spec:
   - checks:
     - inline:
         http:
-        - endpoint: http://config-db-x-default-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/live
+        - endpoint: http://config-db-x-mission-control-x-{{ .Release.Namespace}}.{{ .Release.Namespace}}:8080/live
           name: config-db-{{ .Release.Namespace}}
           responseCodes:
           - 200

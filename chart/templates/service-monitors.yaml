@@ -10,7 +10,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: config-db
       vcluster.loft.sh/managed-by: "{{ .Release.Name }}"
-      vcluster.loft.sh/namespace: default
+      vcluster.loft.sh/namespace: mission-control
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -24,4 +24,4 @@ spec:
     matchLabels:
       app.kubernetes.io/name: mission-control
       vcluster.loft.sh/managed-by: "{{ .Release.Name }}"
-      vcluster.loft.sh/namespace: default
+      vcluster.loft.sh/namespace: mission-control
