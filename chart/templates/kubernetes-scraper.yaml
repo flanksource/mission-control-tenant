@@ -15,8 +15,8 @@ spec:
         kind: HelmRepository
         name: {{ include "mission-control-tenant.fullname" . }}
       interval: 5m
-  targetNamespace: default
-  storageNamespace: default
+  targetNamespace: mission-control
+  storageNamespace: mission-control
   kubeConfig:
     secretRef:
       name: vc-{{ .Release.Name }}
@@ -28,4 +28,4 @@ spec:
     scraper:
       exclusions:
         labels:
-          app.kubernetes.io/instance: default-{{ include "mission-control-tenant.fullname" . }}
+          app.kubernetes.io/instance: mission-control-{{ include "mission-control-tenant.fullname" . }}
