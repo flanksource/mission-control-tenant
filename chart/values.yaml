@@ -32,6 +32,11 @@ missionControl:
     logs.disable: "true"
     settings.logging_backends.disable: "true"
 
+k8sRegistry:
+  clusterName: kubernetes-hosted-saas
+  topology:
+    enabled: false
+
 # See https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml
 vcluster:
   plugin:
