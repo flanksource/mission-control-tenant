@@ -22,9 +22,9 @@ spec:
       name: vc-{{ .Release.Name }}
       key: config
   values:
-    clusterName: kubernetes-hosted-saas
+    clusterName: {{.Values.k8sRegistry.clusterName}}
     topology:
-      enabled: false
+      enabled: {{.Values.k8sRegistry.topology.enabled}}
     scraper:
       exclusions:
         labels:
