@@ -22,9 +22,7 @@ spec:
       name: vc-{{ .Release.Name }}
       key: config
   values:
-    clusterName: {{.Values.k8sRegistry.clusterName}}
-    topology:
-      enabled: {{.Values.k8sRegistry.topology.enabled}}
+    {{- .Values.k8sRegistry | toYaml | nindent 4 }}
     scraper:
       exclusions:
         labels:
