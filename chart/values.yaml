@@ -26,6 +26,7 @@ missionControl:
     enabled: false
   kratos:
     enabled: false
+  cleanupResourcesOnDelete: true
   properties:
     log.kubeproxy: "true"
     incidents.disable: "true"
