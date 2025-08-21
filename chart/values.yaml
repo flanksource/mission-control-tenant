@@ -44,8 +44,8 @@ vcluster:
     sync-host-secrets:
       image: docker.io/flanksource/vcluster-sync-host-secrets:v0.1.6
       env:
-      - name: DESTINATION_NAMESPACE
-        value: mission-control
+        - name: DESTINATION_NAMESPACE
+          value: mission-control
 
   sync:
     secrets:
@@ -60,3 +60,6 @@ vcluster:
     fromHost:
       - from: monitoring/grafana-alloy
         to: mission-control/grafana-alloy
+
+      - from: monitoring/prometheus-kube-prometheus-prometheus
+        to: mission-control/prometheus-kube-prometheus-prometheus
