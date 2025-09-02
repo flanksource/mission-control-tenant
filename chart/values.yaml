@@ -14,7 +14,7 @@ missionControl:
     labels:
       flanksource.com/clerk-org-id: ""
     otel:
-      collector: grafana-alloy.mission-control:4317
+      collector: clickhouse.mission-control:4317
   serviceAccount:
     rbac:
       impersonate: true
@@ -58,5 +58,5 @@ vcluster:
   # Map grafana agent host service to mission-control namespace in tenant to push traces
   mapServices:
     fromHost:
-      - from: monitoring/grafana-alloy
-        to: mission-control/grafana-alloy
+      - from: clickhouse/clickhouse-gateway-opentelemetry-collector
+        to: mission-control/clickhouse
