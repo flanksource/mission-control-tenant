@@ -4,6 +4,8 @@ domain: ""
 missionControlChartVersion: ">=0.0.0"
 tenantSlug: ""
 telemetryPushURL: https://telemetry.app.flanksource.com/push/topology
+database:
+  provider: cnpg
 missionControl:
   authProvider: clerk
   clerkJWKSURL: ""
