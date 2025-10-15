@@ -62,3 +62,5 @@ vcluster:
     fromHost:
       - from: clickhouse/clickhouse-gateway-opentelemetry-collector
         to: mission-control/clickhouse
+      - from: tenant-database/tenant-database-rw
+        to: tenant-database/tenant-database-rw
