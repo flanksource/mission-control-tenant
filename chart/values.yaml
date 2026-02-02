@@ -10,6 +10,7 @@ missionControl:
   authProvider: clerk
   clerkJWKSURL: ""
   clerkOrgID: ""
+  metricsPort: 7891
   global:
     ui:
       host: app.flanksource.com
